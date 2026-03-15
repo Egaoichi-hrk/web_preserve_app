@@ -123,7 +123,7 @@ export default function Home() {
 
         {/* Bookmark list */}
 
-        <div className="space-y-2">
+        <div className="space-y-2 mb-6">
 
           {sortedBookmarks.map((bookmark) => (
 
