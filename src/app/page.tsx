@@ -45,20 +45,22 @@ export default function Home() {
   };
 
   // delete bookmark
-  const deleteBookmark = (index: number) => {
+  const deleteBookmark = (url: string) => {
 
     if (!confirm("Delete this bookmark?")) return;
 
-    const updated = bookmarks.filter((_, i) => i !== index);
+    const updated = bookmarks.filter((b) => b.url !== url);
     setBookmarks(updated);
   };
 
   // toggle favorite
-  const toggleFavorite = (index: number) => {
+  const toggleFavorite = (url: string) => {
 
-    const updated = [...bookmarks];
-
-    updated[index].favorite = !updated[index].favorite;
+    const updated = bookmarks.map((bookmark) =>
+      bookmark.url === url
+        ? { ...bookmark, favorite: !bookmark.favorite }
+        : bookmark
+    );
 
     setBookmarks(updated);
   };
@@ -123,10 +125,10 @@ export default function Home() {
 
         <div className="space-y-2">
 
-          {sortedBookmarks.map((bookmark, index) => (
+          {sortedBookmarks.map((bookmark) => (
 
             <div
-              key={index}
+              key={bookmark.url}
               className="bg-white/10 backdrop-blur-lg p-3 rounded-xl shadow-lg flex justify-between items-center"
             >
 
@@ -142,7 +144,7 @@ export default function Home() {
                 {/* favorite */}
 
                 <button
-                  onClick={() => toggleFavorite(index)}
+                  onClick={() => toggleFavorite(bookmark.url)}
                   className="text-yellow-400 text-lg"
                 >
                   {bookmark.favorite ? "★" : "☆"}
@@ -151,7 +153,7 @@ export default function Home() {
                 {/* delete */}
 
                 <button
-                  onClick={() => deleteBookmark(index)}
+                  onClick={() => deleteBookmark(bookmark.url)}
                   className="text-red-400"
                 >
                   Delete
