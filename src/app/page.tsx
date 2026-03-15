@@ -5,9 +5,11 @@ import { useState, useEffect } from 'react';
 interface Bookmark {
   name: string;
   url: string;
+  favorite: boolean;
 }
 
 export default function Home() {
+
   const [bookmarks, setBookmarks] = useState<Bookmark[]>([]);
   const [name, setName] = useState('');
   const [url, setUrl] = useState('');
@@ -27,35 +29,63 @@ export default function Home() {
 
   // add bookmark
   const addBookmark = () => {
-    if (name && url) {
-      setBookmarks([...bookmarks, { name, url }]);
-      setName('');
-      setUrl('');
-    }
+
+    if (!name || !url) return;
+
+    const newBookmark: Bookmark = {
+      name,
+      url,
+      favorite: false
+    };
+
+    setBookmarks([...bookmarks, newBookmark]);
+
+    setName('');
+    setUrl('');
   };
 
   // delete bookmark
   const deleteBookmark = (index: number) => {
+
     if (!confirm("Delete this bookmark?")) return;
+
     const updated = bookmarks.filter((_, i) => i !== index);
     setBookmarks(updated);
   };
 
-  // open bookmark
+  // toggle favorite
+  const toggleFavorite = (index: number) => {
+
+    const updated = [...bookmarks];
+
+    updated[index].favorite = !updated[index].favorite;
+
+    setBookmarks(updated);
+  };
+
+  // open website
   const openBookmark = (url: string) => {
     window.open(url, '_blank');
   };
 
+  // favoriteを上に表示
+  const sortedBookmarks = [...bookmarks].sort(
+    (a, b) => Number(b.favorite) - Number(a.favorite)
+  );
+
   return (
     <div className="min-h-screen bg-black p-2">
+
       <div className="max-w-lg mx-auto">
 
-        <h1 className="text-2xl font-bold text-center mb-18 mt-18 text-white drop-shadow-lg">
+        <h1 className="text-2xl font-bold text-center mb-18 mt-18 text-white">
           Favorite Websites
         </h1>
 
         {/* Add bookmark */}
+
         <div className="bg-white/10 backdrop-blur-lg p-4 rounded-xl shadow-xl mb-18">
+
           <h2 className="text-lg font-semibold mb-2 text-white">
             Add New Bookmark
           </h2>
@@ -67,7 +97,7 @@ export default function Home() {
               placeholder="Website Name"
               value={name}
               onChange={(e) => setName(e.target.value)}
-              className="w-full p-2 bg-white/20 border border-white/30 rounded-lg text-white placeholder-white/70 focus:outline-none"
+              className="w-full p-2 bg-white/20 border border-white/30 rounded-lg text-white"
             />
 
             <input
@@ -75,23 +105,25 @@ export default function Home() {
               placeholder="Website URL"
               value={url}
               onChange={(e) => setUrl(e.target.value)}
-              className="w-full p-2 bg-white/20 border border-white/30 rounded-lg text-white placeholder-white/70 focus:outline-none"
+              className="w-full p-2 bg-white/20 border border-white/30 rounded-lg text-white"
             />
 
             <button
               onClick={addBookmark}
-              className="w-full bg-white/20 text-white p-2 rounded-lg hover:bg-white/30 transition-colors"
+              className="w-full bg-white/20 text-white p-2 rounded-lg hover:bg-white/30"
             >
               Add Bookmark
             </button>
 
           </div>
+
         </div>
 
         {/* Bookmark list */}
+
         <div className="space-y-2">
 
-          {bookmarks.map((bookmark, index) => (
+          {sortedBookmarks.map((bookmark, index) => (
 
             <div
               key={index}
@@ -105,12 +137,27 @@ export default function Home() {
                 {bookmark.name}
               </h3>
 
-              <button
-                onClick={() => deleteBookmark(index)}
-                className="text-red-400 hover:text-red-300"
-              >
-                Delete
-              </button>
+              <div className="flex gap-3">
+
+                {/* favorite */}
+
+                <button
+                  onClick={() => toggleFavorite(index)}
+                  className="text-yellow-400 text-lg"
+                >
+                  {bookmark.favorite ? "★" : "☆"}
+                </button>
+
+                {/* delete */}
+
+                <button
+                  onClick={() => deleteBookmark(index)}
+                  className="text-red-400"
+                >
+                  Delete
+                </button>
+
+              </div>
 
             </div>
 
@@ -119,6 +166,7 @@ export default function Home() {
         </div>
 
       </div>
+
     </div>
   );
 }
